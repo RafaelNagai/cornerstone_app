@@ -4,6 +4,7 @@ import 'package:cornerstone_app/features/signin/presentation/states/signin_state
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -27,7 +28,11 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   void _login() {
     ref
         .read(authProvider.notifier)
-        .signIn(emailController.text, passwordController.text);
+        .signIn(emailController.text, passwordController.text)
+        .onError((error, stackTrace) {
+          context.push('/');
+        });
+    context.push('/student');
   }
 
   @override

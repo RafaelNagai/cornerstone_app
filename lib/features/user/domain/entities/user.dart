@@ -10,6 +10,10 @@ class User extends GetterFromHtml<User> with HasStudentCourses {
     }
   }
 
+  String firstName() {
+    return name.split(' ').first;
+  }
+
   @override
   User getFromHtml(String html) {
     final coursesHtml = html.split(

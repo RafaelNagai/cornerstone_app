@@ -3,15 +3,16 @@ import 'package:cornerstone_app/core/http/dio_with_converter_manager.dart';
 import 'package:cornerstone_app/features/course/domain/entities/grade.dart';
 import 'package:cornerstone_app/features/signin/presentation/states/signin_state.dart';
 import 'package:cornerstone_app/features/user/domain/entities/user.dart';
-import 'package:flutter/widgets.dart';
+import 'package:cornerstone_app/features/user/presentation/providers/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(),
+  (ref) => AuthNotifier(ref),
 );
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(AuthInitial());
+  final Ref ref;
+  AuthNotifier(this.ref) : super(AuthInitial());
 
   Future<void> signIn(String userId, String password) async {
     state = AuthLoading();
@@ -22,30 +23,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
         User(name: ''),
       );
 
-      for (var course in user.getCourses()) {
+      for (int i = 0; i < user.getCourses().length; i++) {
+        final course = user.getCourses()[i];
+
         final gradeData = await DioWithConverterManager(dio: DioManager())
             .get<Grade>(
               'https://ciccc.ampeducator.ca/web/studentPortal/courses/getGrades?courseID=${course.id}',
               Grade.empty(),
             );
-        course = course.copyWith(score: gradeData);
+
+        // Atualiza a nota no curso
+        user.getCourses()[i] = course.copyWith(score: gradeData);
       }
 
-      currentUser = user;
-
-      // final uri = Uri.parse(HttpManager.baseUrl);
-      // final cookies = await DioManager().cookieJar.loadForRequest(uri);
-      // debugPrint('🍪 Cookies salvos: $cookies');
-
-      // final response = await DioManager().get<dynamic>(
-      //   'https://ciccc.ampeducator.ca/web/studentPortal/courses/getGrades?courseID=7129',
-      // );
-      // debugPrint(response.data);
-      //Aqui tem que aplicar a logica pra extrair tudo do usuario.
+      // Atualiza o estado global do usuário
+      ref.read(currentUserProvider.notifier).state = user;
 
       state = AuthSuccess();
     } catch (e) {
-      state = AuthError('Erro ao fazer login');
+      state = AuthError('Login failed: ${e.toString()}');
+      rethrow;
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cornerstone_app/core/http/dio_manager.dart';
 import 'package:cornerstone_app/core/http/dio_with_converter_manager.dart';
+import 'package:cornerstone_app/features/course/domain/entities/grade.dart';
 import 'package:cornerstone_app/features/signin/presentation/states/signin_state.dart';
 import 'package:cornerstone_app/features/user/domain/entities/user.dart';
 import 'package:flutter/widgets.dart';
@@ -20,10 +21,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
         '/public/authenticate/login?loginAction=login&userName=$userId&userPass=$password',
         User(name: ''),
       );
-      debugPrint(user.name);
-      // await DioManager().post<dynamic>(
-      //   '/public/authenticate/login?loginAction=login&userName=$userId&userPass=$password',
-      // );
+
+      for (var course in user.getCourses()) {
+        final gradeData = await DioWithConverterManager(dio: DioManager())
+            .get<Grade>(
+              'https://ciccc.ampeducator.ca/web/studentPortal/courses/getGrades?courseID=${course.id}',
+              Grade.empty(),
+            );
+        course = course.copyWith(score: gradeData);
+      }
+
+      currentUser = user;
 
       // final uri = Uri.parse(HttpManager.baseUrl);
       // final cookies = await DioManager().cookieJar.loadForRequest(uri);

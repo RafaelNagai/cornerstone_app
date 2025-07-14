@@ -30,11 +30,16 @@ abstract class GetterFromHtml<TModel> {
   TModel getFromHtml(String html);
 
   T getterFromHtml<T>(
-    html, {
+    String html, {
     required String startWith,
     required String endWith,
+    T Function(String)? converter,
   }) {
     final firstPart = html.split(startWith)[1];
+    if (converter != null) {
+      final valueToConvert = firstPart.split(endWith)[0];
+      return converter(valueToConvert);
+    }
     return firstPart.split(endWith)[0] as T;
   }
 }

@@ -20,6 +20,8 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   void initState() {
     DioManager().init();
     super.initState();
+    emailController.text = "2024003178";
+    passwordController.text = "zrvIYrhZ";
   }
 
   void _login() {

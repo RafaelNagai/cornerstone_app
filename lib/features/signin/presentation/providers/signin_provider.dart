@@ -1,7 +1,9 @@
 import 'package:cornerstone_app/core/http/dio_manager.dart';
 import 'package:cornerstone_app/core/http/dio_with_converter_manager.dart';
+import 'package:cornerstone_app/features/course/domain/entities/attendance_course.dart';
 import 'package:cornerstone_app/features/course/domain/entities/grade.dart';
 import 'package:cornerstone_app/features/signin/presentation/states/signin_state.dart';
+import 'package:cornerstone_app/features/student/domain/entities/attendance.dart';
 import 'package:cornerstone_app/features/user/domain/entities/user.dart';
 import 'package:cornerstone_app/features/user/presentation/providers/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,8 +34,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
               Grade.empty(),
             );
 
+        final attendanceCourseData =
+            await DioWithConverterManager(dio: DioManager()).get<Attendance>(
+              'https://ciccc.ampeducator.ca/web/studentPortal/attendance/list',
+              AttendanceCourse(absences: 0, courseName: course.name),
+            );
+
         // Atualiza a nota no curso
-        user.getCourses()[i] = course.copyWith(score: gradeData);
+        user.getCourses()[i] = course.copyWith(
+          score: gradeData,
+          attendance: attendanceCourseData,
+        );
       }
 
       // Atualiza o estado global do usuário

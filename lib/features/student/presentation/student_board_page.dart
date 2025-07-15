@@ -42,15 +42,14 @@ class StudentBoardPage extends ConsumerWidget {
                         final course = courses[index];
                         return ListTile(
                           title: Text(course.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          subtitle: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 'Score: ${course.grade.score.toStringAsFixed(1)}%',
                               ),
-                              Text(
-                                'Attendance: ${course.grade.score.toStringAsFixed(1)}%',
-                              ),
+                              Text('Absence: ${course.attendance.absences}'),
                             ],
                           ),
                           leading: const Icon(Icons.school),

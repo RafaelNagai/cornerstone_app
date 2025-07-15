@@ -19,51 +19,139 @@ class _SignInPageState extends ConsumerState<SignInPage> {
 
   @override
   void initState() {
-    DioManager().init();
+    DioManager().init().then((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final notifier = ref.read(authProvider.notifier);
+        final isLoggedIn = await notifier.autoLogin();
+        if (isLoggedIn) {
+          context.go('/student');
+        }
+      });
+    });
     super.initState();
     emailController.text = "2024003178";
     passwordController.text = "zrvIYrhZ";
   }
 
-  void _login() {
-    ref
-        .read(authProvider.notifier)
-        .signIn(emailController.text, passwordController.text)
-        .onError((error, stackTrace) {
-          context.push('/');
-        });
-    context.push('/student');
+  void _login() async {
+    final notifier = ref.read(authProvider.notifier);
+    await notifier.signIn(emailController.text, passwordController.text).then((
+      _,
+    ) {
+      final state = ref.read(authProvider);
+      if (state is AuthSuccess) {
+        context.go('/student');
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
+    final isLoading = state is AuthLoading;
+    final hasError = state is AuthError;
+
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Login'.tr())),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'User ID'.tr()),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo ou imagem ilustrativa
+                Image.asset(
+                  'assets/images/login_illustration.png',
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 24),
+
+                Text(
+                  'Login'.tr(),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // User ID
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.person),
+                    labelText: 'User ID'.tr(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Password
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock),
+                    labelText: 'Password'.tr(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.login),
+                            label: Text(
+                              'Entrar',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: _login,
+                          ),
+                        ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Mensagem de erro ou sucesso
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: hasError
+                      ? Text(
+                          (state).message,
+                          key: const ValueKey('error'),
+                          style: const TextStyle(color: Colors.red),
+                        )
+                      : state is AuthSuccess
+                      ? Text(
+                          'hello'.tr(),
+                          key: const ValueKey('success'),
+                          style: const TextStyle(color: Colors.green),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
             ),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'.tr()),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            if (state is AuthLoading)
-              CircularProgressIndicator()
-            else
-              ElevatedButton(onPressed: _login, child: Text('Entrar')),
-            if (state is AuthError)
-              Text(state.message, style: TextStyle(color: Colors.red)),
-            if (state is AuthSuccess)
-              Text('hello'.tr(), style: TextStyle(color: Colors.green)),
-          ],
+          ),
         ),
       ),
     );

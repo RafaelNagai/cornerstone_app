@@ -19,16 +19,15 @@ class _SignInPageState extends ConsumerState<SignInPage> {
 
   @override
   void initState() {
-    DioManager().init().then((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final notifier = ref.read(authProvider.notifier);
-        final isLoggedIn = await notifier.autoLogin();
-        if (isLoggedIn) {
-          context.go('/student');
-        }
-      });
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await DioManager().init();
+      final notifier = ref.read(authProvider.notifier);
+      final isLoggedIn = await notifier.autoLogin();
+      if (isLoggedIn) {
+        context.go('/student');
+      }
+    });
     emailController.text = "2024003178";
     passwordController.text = "zrvIYrhZ";
   }

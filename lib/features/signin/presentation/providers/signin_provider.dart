@@ -22,16 +22,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final uri = Uri.parse(HttpManager.baseUrl);
       final cookies = await DioManager().cookieJar.loadForRequest(uri);
-      if (cookies.isNotEmpty) {
-        final user = await DioWithConverterManager(
-          dio: DioManager(),
-        ).post<User>('/home/dashboard/prepare', User(name: ''));
-        await _authLogin(user);
-      }
-      state = AuthInitial();
+      final user = await DioWithConverterManager(
+        dio: DioManager(),
+      ).post<User>('/home/dashboard/prepare', User(name: ''));
+      await _authLogin(user);
       return cookies.isNotEmpty;
     } catch (_) {
       return false;
+    } finally {
+      state = AuthInitial();
     }
   }
 

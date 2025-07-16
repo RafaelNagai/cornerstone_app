@@ -14,6 +14,7 @@ class CornerStoneApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       theme: AppTheme.light,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

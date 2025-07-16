@@ -20,7 +20,7 @@ class User extends GetterFromHtml<User> with HasStudentCourses {
     final regex = RegExp(r'<li>\s*(.*?)\s*</li>', dotAll: true);
     final match = regex.firstMatch(html);
 
-    if (match != null && match.groupCount > 0) {
+    if (match != null && match.groupCount > 1) {
       final liContent = match.group(1);
       throw AuthException(liContent ?? "Something went wrong");
     }

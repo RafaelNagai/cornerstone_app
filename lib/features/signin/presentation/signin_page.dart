@@ -20,14 +20,6 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await DioManager().init();
-      final notifier = ref.read(authProvider.notifier);
-      final isLoggedIn = await notifier.autoLogin();
-      if (isLoggedIn) {
-        context.go('/student');
-      }
-    });
     emailController.text = "2024003178";
     passwordController.text = "zrvIYrhZ";
   }
@@ -49,10 +41,6 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     final state = ref.watch(authProvider);
     final isLoading = state is AuthLoading;
     final hasError = state is AuthError;
-
-    if (isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,

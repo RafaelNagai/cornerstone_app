@@ -37,6 +37,7 @@ class _StudentBoardPageState extends ConsumerState<StudentBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).padding.bottom;
     final user = ref.watch(currentUserProvider);
 
     if (user == null) {
@@ -149,7 +150,11 @@ class _StudentBoardPageState extends ConsumerState<StudentBoardPage> {
                   ),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: bottom + 20,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final course = _courses[index];

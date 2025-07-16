@@ -22,8 +22,6 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   @override
   void initState() {
     super.initState();
-    emailController.text = "2024003178";
-    passwordController.text = "qIaBpKI8";
   }
 
   void _login() async {

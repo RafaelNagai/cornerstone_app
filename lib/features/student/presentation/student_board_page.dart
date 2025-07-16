@@ -1,8 +1,10 @@
+import 'package:cornerstone_app/features/signin/presentation/providers/signin_provider.dart';
 import 'package:cornerstone_app/features/student/presentation/components/course_card.dart';
 import 'package:cornerstone_app/features/user/presentation/providers/user_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class StudentBoardPage extends ConsumerStatefulWidget {
   const StudentBoardPage({super.key});
@@ -42,60 +44,65 @@ class _StudentBoardPageState extends ConsumerState<StudentBoardPage> {
     }
 
     return Scaffold(
-      drawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  DrawerHeader(
-                    decoration: BoxDecoration(color: Color(0xFF002855)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Hi, {name}!'.tr(
-                            namedArgs: {'name': user.firstName()},
+      drawer: SafeArea(
+        child: Drawer(
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    DrawerHeader(
+                      decoration: BoxDecoration(color: Color(0xFF002855)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Hi, {name}!'.tr(
+                              namedArgs: {'name': user.firstName()},
+                            ),
+                            style: TextStyle(
+                              color: Colors.yellow.shade400,
+                              fontSize: 24,
+                            ),
                           ),
-                          style: TextStyle(
-                            color: Colors.yellow.shade400,
-                            fontSize: 24,
+                          Text(
+                            'Welcome to cornerstone app.'.tr(),
+                            style: TextStyle(color: Colors.grey.shade200),
                           ),
-                        ),
-                        Text(
-                          'Welcome to cornerstone app.'.tr(),
-                          style: TextStyle(color: Colors.grey.shade200),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: Text('Logout'.tr()),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              "Version: 1.0.0",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Text(
-                "By Rafael Kenji Sales Nagai",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: Text('Logout'.tr()),
+                      onTap: () {
+                        ref.read(authProvider.notifier).signOut();
+                        context.pushReplacement('/signin');
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Text(
+                "Version: 1.0.0",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: Text(
+                  "By Rafael Kenji Sales Nagai",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       body: CustomScrollView(

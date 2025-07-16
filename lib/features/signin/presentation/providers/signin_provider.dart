@@ -17,6 +17,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
   AuthNotifier(this.ref) : super(AuthLoading());
 
+  Future<void> signOut() async {
+    state = AuthLoading();
+    try {
+      final uri = Uri.parse(HttpManager.baseUrl);
+      await DioManager().cookieJar.delete(uri);
+      ref.read(currentUserProvider.notifier).state = null;
+      state = AuthInitial();
+      await DioWithConverterManager(
+        dio: DioManager(),
+      ).post<User>('/home/dashboard/prepare', User(name: ''));
+      // ignore: empty_catches
+    } catch (e) {}
+  }
+
   Future<bool> autoLogin() async {
     state = AuthLoading();
     try {

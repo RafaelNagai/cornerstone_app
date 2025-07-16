@@ -47,7 +47,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = AuthSuccess();
     } catch (e) {
-      state = AuthError('Login failed: ${e.toString()}');
+      state = AuthError(
+        e is AuthException ? e.message : 'UserID or Password is incorrect',
+      );
       rethrow;
     }
   }
@@ -77,4 +79,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // Atualiza o estado global do usuário
     ref.read(currentUserProvider.notifier).state = user;
   }
+}
+
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+
+  @override
+  String toString() => message;
 }

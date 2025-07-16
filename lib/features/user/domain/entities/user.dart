@@ -1,5 +1,6 @@
 import 'package:cornerstone_app/core/http/dio_with_converter_manager.dart';
 import 'package:cornerstone_app/features/course/domain/entities/student_course.dart';
+import 'package:cornerstone_app/features/signin/presentation/providers/signin_provider.dart';
 
 class User extends GetterFromHtml<User> with HasStudentCourses {
   final String name;
@@ -16,6 +17,14 @@ class User extends GetterFromHtml<User> with HasStudentCourses {
 
   @override
   User getFromHtml(String html) {
+    final regex = RegExp(r'<li>\s*(.*?)\s*</li>', dotAll: true);
+    final match = regex.firstMatch(html);
+
+    if (match != null && match.groupCount > 0) {
+      final liContent = match.group(1);
+      throw AuthException(liContent ?? "Something went wrong");
+    }
+
     final coursesHtml = html.split(
       '<ul class="dropdown-menu nav-menu-dropdown-menu nav-menu-dropdown-menu-short">',
     );

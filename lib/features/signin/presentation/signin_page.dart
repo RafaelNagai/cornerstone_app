@@ -1,4 +1,6 @@
-import 'package:cornerstone_app/core/http/dio_manager.dart';
+import 'package:cornerstone_app/features/signin/presentation/components/animated_formfield.dart';
+import 'package:cornerstone_app/features/signin/presentation/components/animated_logo.dart';
+import 'package:cornerstone_app/features/signin/presentation/components/auth_message.dart';
 import 'package:cornerstone_app/features/signin/presentation/providers/signin_provider.dart';
 import 'package:cornerstone_app/features/signin/presentation/states/signin_state.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -40,7 +42,6 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
     final isLoading = state is AuthLoading;
-    final hasError = state is AuthError;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -51,91 +52,73 @@ class _SignInPageState extends ConsumerState<SignInPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo ou imagem ilustrativa
-                Image.asset(
-                  'assets/images/login_illustration.png',
-                  height: 180,
-                  fit: BoxFit.contain,
-                ),
+                const AnimatedLogo(),
                 const SizedBox(height: 24),
 
                 Text(
-                  'Login'.tr(),
+                  'Student Portal'.tr(),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // User ID
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.person),
-                    labelText: 'User ID'.tr(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                AnimatedFormField(
+                  index: 0,
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.person),
+                      labelText: 'User ID'.tr(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Password
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock),
-                    labelText: 'Password'.tr(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                AnimatedFormField(
+                  index: 1,
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock),
+                      labelText: 'Password'.tr(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: isLoading
-                      ? const CircularProgressIndicator()
-                      : SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.login),
-                            label: Text(
-                              'Entrar',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                AnimatedFormField(
+                  index: 2,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: isLoading
+                        ? const CircularProgressIndicator()
+                        : SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.login),
+                              label: Text('Enter'.tr()),
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
+                              onPressed: _login,
                             ),
-                            onPressed: _login,
                           ),
-                        ),
+                  ),
                 ),
-
                 const SizedBox(height: 16),
 
-                // Mensagem de erro ou sucesso
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: hasError
-                      ? Text(
-                          (state).message,
-                          key: const ValueKey('error'),
-                          style: const TextStyle(color: Colors.red),
-                        )
-                      : state is AuthSuccess
-                      ? Text(
-                          'hello'.tr(),
-                          key: const ValueKey('success'),
-                          style: const TextStyle(color: Colors.green),
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                AuthMessage(state: state),
               ],
             ),
           ),
